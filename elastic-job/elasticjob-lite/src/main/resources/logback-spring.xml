@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--  日志级别：TRACE < DEBUG < INFO < WARN < ERROR -->
+    <!-- 导入默认配置 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <!-- 导入默认的控制台日志配置：CONSOLE -->
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <!-- 导入默认的文件日志配置：FILE -->
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
+    <springProfile name="dev">
+        <logger name="com.ai.iisc" level="INFO"></logger>
+        <logger name="com.ai.ecs.ecop" level="INFO"></logger>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+    <springProfile name="test">
+        <logger name="com.ai.iisc" level="INFO"></logger>
+        <logger name="com.ai.ecs.ecop" level="INFO"></logger>
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+    <springProfile name="prod">
+        <logger name="com.ai.iisc" level="INFO"></logger>
+        <logger name="com.ai.ecs.ecop" level="INFO"></logger>
+        <root level="WARN">
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+    <!--<root level="DEBUG">-->
+        <!--<appender-ref ref="CONSOLE" />-->
+    <!--</root>-->
+    <logger name="com.ai.iisc" level="DEBUG"></logger>
+    <logger name="com.ai.ecs.ecop" level="DEBUG"></logger>
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

@@ -1,0 +1,3 @@
+com.simba.elasticjob.handler.sharding.impl.AverageAllocationJobShardingStrategy
+com.simba.elasticjob.handler.sharding.impl.OdevitySortByNameJobShardingStrategy
+com.simba.elasticjob.handler.sharding.impl.RoundRobinByNameJobShardingStrategy

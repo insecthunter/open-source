@@ -1,0 +1,3 @@
+com.simba.elasticjob.error.handler.general.IgnoreJobErrorHandler
+com.simba.elasticjob.error.handler.general.LogJobErrorHandler
+com.simba.elasticjob.error.handler.general.ThrowJobErrorHandler

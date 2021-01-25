@@ -1,0 +1,2 @@
+com.simba.elasticjob.handler.threadpool.impl.CPUUsageJobExecutorServiceHandler
+com.simba.elasticjob.handler.threadpool.impl.SingleThreadJobExecutorServiceHandler

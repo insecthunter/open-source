@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 /**
- * @Description
+ * @Description 作业类命提供工厂类
  * @Author yuanjx3
  * @Date 2021/1/22 9:37
  * @Version V1.0

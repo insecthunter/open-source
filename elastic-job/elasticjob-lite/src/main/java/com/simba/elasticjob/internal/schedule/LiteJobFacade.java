@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @Description
+ * @Description Lite job外观类（管理类）
  * @Author yuanjx3
  * @Date 2021/1/21 16:11
  * @Version V1.0
@@ -91,6 +91,7 @@ public final class LiteJobFacade implements JobFacade {
                 return executionContextService.getJobShardingContext(failoverShardingItems);
             }
         }
+        // 执行分片
         shardingService.shardingIfNecessary();
         List<Integer> shardingItems = shardingService.getLocalShardingItems();
         if (isFailover) {
@@ -139,6 +140,10 @@ public final class LiteJobFacade implements JobFacade {
         jobTracingEventBus.post(jobExecutionEvent);
     }
 
+    /** 功能描述: 往作业追踪事件总线上推送作业状态追踪事件
+    * @version: 1.0.0
+    * @Author: yuanjx3
+    */
     @Override
     public void postJobStatusTraceEvent(final String taskId, final State state, final String message) {
         TaskContext taskContext = TaskContext.from(taskId);

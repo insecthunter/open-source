@@ -35,16 +35,18 @@ public final class SchedulerFacade {
         return new JobTriggerListener(executionService, shardingService);
     }
 
+    /** 停机服务器实例 **/
     public void shutdownInstance() {
+        //如果当前节点是leader，则移除Leader
         if (leaderService.isLeader()){
             leaderService.removeLeader();
         }
+
+        // 如果协调服务正在运行，先暂停
         if (reconcileService.isRunning()){
             reconcileService.stopAsync();
         }
+        // 执行停机
         JobRegistry.getInstance().shutdown(jobName);
     }
-
-
-
 }

@@ -22,7 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 /**
- * @Description  ElasticJob executor.
+ * @Description  ElasticJob 执行器.
  * @Author yuanjx3
  * @Date 2021/1/22 8:28
  * @Version V1.0
@@ -64,19 +64,26 @@ public final class ElasticJobExecutor {
         executorContext.reloadIfNecessary(jobConfig);
         JobErrorHandler jobErrorHandler = executorContext.get(JobErrorHandler.class);
         try {
+            // 检查作业执行环境（作业服务器与注册中心之间时差超过最大允许时差时，
+            // 会抛出JobExecutionEnvironmentException异常，中断执行）
             jobFacade.checkJobExecutionEnvironment();
         } catch (final JobExecutionEnvironmentException cause) {
             jobErrorHandler.handleException(jobConfig.getJobName(), cause);
         }
+        // 这里会触发执行作业分片
         ShardingContexts shardingContexts = jobFacade.getShardingContexts();
+        // 往总线上推送作业状态为 TASK_STAGING 的事件
         jobFacade.postJobStatusTraceEvent(shardingContexts.getTaskId(), JobStatusTraceEvent.State.TASK_STAGING, String.format("Job '%s' execute begin.", jobConfig.getJobName()));
+        // 如果没有作业分片在执行，设置未触发标识符
         if (jobFacade.misfireIfRunning(shardingContexts.getShardingItemParameters().keySet())) {
+            //设置未触发标识符成功后，往总线上推送作业状态为 TASK_FINISHED 的事件
             jobFacade.postJobStatusTraceEvent(shardingContexts.getTaskId(), JobStatusTraceEvent.State.TASK_FINISHED, String.format(
                     "Previous job '%s' - shardingItems '%s' is still running, misfired job will start after previous job completed.", jobConfig.getJobName(),
                     shardingContexts.getShardingItemParameters().keySet()));
             return;
         }
         try {
+            // 作业分片执行前设置
             jobFacade.beforeJobExecuted(shardingContexts);
             //CHECKSTYLE:OFF
         } catch (final Throwable cause) {
@@ -100,11 +107,14 @@ public final class ElasticJobExecutor {
 
     private void execute(final JobConfiguration jobConfig, final ShardingContexts shardingContexts, final JobExecutionEvent.ExecutionSource executionSource) {
         if (shardingContexts.getShardingItemParameters().isEmpty()) {
+            // 如果作业分片为空，往总线上推送作业状态为 TASK_FINISHED 的事件，然后返回
             jobFacade.postJobStatusTraceEvent(shardingContexts.getTaskId(), JobStatusTraceEvent.State.TASK_FINISHED, String.format("Sharding item for job '%s' is empty.", jobConfig.getJobName()));
             return;
         }
+        // 注册作业开始执行
         jobFacade.registerJobBegin(shardingContexts);
         String taskId = shardingContexts.getTaskId();
+        // 往总线上推送作业状态为 TASK_RUNNING 的事件
         jobFacade.postJobStatusTraceEvent(taskId, JobStatusTraceEvent.State.TASK_RUNNING, "");
         try {
             process(jobConfig, shardingContexts, executionSource);
@@ -119,14 +129,19 @@ public final class ElasticJobExecutor {
         }
     }
 
+    /** 执行作业 **/
     private void process(final JobConfiguration jobConfig, final ShardingContexts shardingContexts, final JobExecutionEvent.ExecutionSource executionSource) {
+        // 获取作业分片集合
         Collection<Integer> items = shardingContexts.getShardingItemParameters().keySet();
+        // 如果分片数为1，直接进行处理
         if (1 == items.size()) {
             int item = shardingContexts.getShardingItemParameters().keySet().iterator().next();
             JobExecutionEvent jobExecutionEvent = new JobExecutionEvent(IpUtils.getHostName(), IpUtils.getIp(), shardingContexts.getTaskId(), jobConfig.getJobName(), executionSource, item);
             process(jobConfig, shardingContexts, item, jobExecutionEvent);
             return;
         }
+        // 分片数大于1，初始化分片数大小的计数器
+        //然后创建线程池，将处理线程提交至线程池执行
         CountDownLatch latch = new CountDownLatch(items.size());
         for (int each : items) {
             JobExecutionEvent jobExecutionEvent = new JobExecutionEvent(IpUtils.getHostName(), IpUtils.getIp(), shardingContexts.getTaskId(), jobConfig.getJobName(), executionSource, each);
@@ -155,9 +170,12 @@ public final class ElasticJobExecutor {
         log.trace("Job '{}' executing, item is: '{}'.", jobConfig.getJobName(), item);
         JobExecutionEvent completeEvent;
         try {
+            // 这个jobItemExecutor就是前面工厂类根据我的MyJob类型找到的 SimpleJobExecutor，执行的就是SimpleJobExecutor的execute方法
+            // 这里的elasticJob就是我前面传入的MyJob作业
             jobItemExecutor.process(elasticJob, jobConfig, jobFacade, shardingContexts.createShardingContext(item));
             completeEvent = startEvent.executionSuccess();
             log.trace("Job '{}' executed, item is: '{}'.", jobConfig.getJobName(), item);
+            // 至此，一次作业分片执行完成
             jobFacade.postJobExecutionEvent(completeEvent);
             // CHECKSTYLE:OFF
         } catch (final Throwable cause) {

@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 /**
- * @Description Executor Service Reloadable
+ * @Description Executor Service Reloadable：作业执行服务管理类
  * @Author yuanjx3
  * @Date 2021/1/22 8:53
  * @Version V1.0
@@ -27,6 +27,7 @@ public class ExecutorServiceReloadable implements Reloadable<ExecutorService>, R
     public void init(final JobConfiguration jobConfig) {
         jobExecutorServiceHandlerType = StringUtils.isNullOrEmpty(jobConfig.getJobExecutorServiceHandlerType())
                 ? JobExecutorServiceHandlerFactory.DEFAULT_HANDLER : jobConfig.getJobExecutorServiceHandlerType();
+        // 根据作业配置的jobExecutorServiceHandlerType类型，创建该job的作业执行服务实例
         executorService = JobExecutorServiceHandlerFactory.getHandler(jobExecutorServiceHandlerType).createExecutorService(jobConfig.getJobName());
     }
 

@@ -6,7 +6,7 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import java.util.concurrent.*;
 
 /**
- * @Description ElasticJob Executor Service
+ * @Description ElasticJob 作业执行服务
  * @Author yuanjx3
  * @Date 2021/1/22 9:00
  * @Version V1.0
@@ -18,14 +18,14 @@ public class ElasticJobExecutorService {
 
     public ElasticJobExecutorService(final String namingPattern, final int threadSize) {
         workQueue = new LinkedBlockingQueue<>();
+        //根据传入的线程数量，创建线程池
         threadPoolExecutor = new ThreadPoolExecutor(
                 threadSize, threadSize, 5L, TimeUnit.MINUTES, workQueue, new BasicThreadFactory.Builder().namingPattern(String.join("-", namingPattern, "%s")).build());
         threadPoolExecutor.allowCoreThreadTimeOut(true);
     }
 
     /**
-     * Create executor service.
-     *
+     * Create executor service. 创建作业执行服务
      * @return executor service
      */
     public ExecutorService createExecutorService() {

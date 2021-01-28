@@ -28,6 +28,7 @@ public class ScheduleJobBootstrap implements JobBootstrap {
     /** 作业调度 **/
     public void schedule(){
         Preconditions.checkArgument(!StringUtils.isNullOrEmpty(jobScheduler.getJobConfig().getCron()),"Cron can not be empty.");
+        System.out.println("~~~schedule~~~");
         jobScheduler.getJobSchedulerController().shedulerJob(jobScheduler.getJobConfig().getCron());
     }
     @Override

@@ -22,7 +22,6 @@ public final class GuaranteeService {
     }
 
     /** 功能描述: 注册启动开始
-    *
     * @param: [shardingItems： to be registered sharding items]
     * @return: void
     * @version: 1.0.0
@@ -31,12 +30,12 @@ public final class GuaranteeService {
     */
     public void registerStart(Collection<Integer> shardingItems){
         for (int each : shardingItems){
+            // 创建 "/started/each"节点，标识作业分片已启动
             jobNodeStorage.createJobNodeIfNeeded(GuaranteeNode.getStartedNode(each));
         }
     }
 
     /** 功能描述: 判断当前分片项是否全部注册启动成功
-     *
      * @param: [shardingItems： current sharding items]
      * @return: boolean
      * @version: 1.0.0
@@ -53,7 +52,6 @@ public final class GuaranteeService {
     }
 
     /** 功能描述: 判断job的分片项是否全部启动。
-     *
      * @param: [shardingItems： current sharding items]
      * @return: boolean
      * @version: 1.0.0

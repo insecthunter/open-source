@@ -16,7 +16,7 @@ public class MyJob implements SimpleJob {
         switch (shardingContext.getShardingItem()) {
             case 0:
                 // do something by sharding item 0
-                System.out.println("ShardingItem -----0");
+                System.out.println("ShardingItem -----00");
                 break;
             case 1:
                 // do something by sharding item 1

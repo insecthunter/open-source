@@ -32,16 +32,22 @@ public abstract class AbstractDistributeOnceElasticJobListener implements Elasti
 
     @Override
     public void beforeJobExecuted(ShardingContexts shardingContexts) {
+        System.out.println("~~~beforeJobExecuted");
+        // 获取所有的分片
         Set<Integer> shardingItems = shardingContexts.getShardingItemParameters().keySet();
         if (shardingItems.isEmpty()){
             return;
         }
+        // 注册作业分片启动节点
         guaranteeService.registerStart(shardingItems);
+        // 阻塞直至所有的分片项的启动节点全部注册成功
         while (!guaranteeService.isRegisterStartSuccess(shardingItems)){
             BlockUtils.waitingShorTime();
         }
+        //判断所有的作业分片项的启动节点是否全部注册成功
         if (guaranteeService.isAllStarted()){
             doBeforeJobExecutedAtLastStarted(shardingContexts);
+            //清理所有的作业分片项的启动节点
             guaranteeService.clearAllStartedInfo();
             return;
         }
@@ -53,6 +59,7 @@ public abstract class AbstractDistributeOnceElasticJobListener implements Elasti
         } catch (InterruptedException e) {
             Thread.interrupted();
         }
+        // 作业超时处理
         if (timeService.getCurrentMillis() - before >= startedTimeoutMilliseconds) {
             guaranteeService.clearAllStartedInfo();
             handleTimeout(startedTimeoutMilliseconds);

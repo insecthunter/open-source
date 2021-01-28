@@ -47,7 +47,6 @@ public final class ElectionListenerManager extends AbstractListenerManager {
 
         @Override
         protected void dataChanged(String path, Type eventType, String data) {
-
             // 如果注册中心未关闭，并且主动选举或被动选举条件成了，则执行leader选举
             if (!JobRegistry.getInstance().isShutdown(jobName) && (isActiveElection(path, data) || isPassiveElection(path, eventType))){
                 log.debug("leader 节点发生变化，开始新一轮的leader选举~~~~~~~~~~");

@@ -53,7 +53,6 @@ public class SetUpFacade {
 
     /** 功能描述:  注册启动信息
      * @param enabled enable job on startup
-     * @version: 1.0.0
      * @Author: yuanjx3
      * @Date: 2021/1/21 12:27
      */

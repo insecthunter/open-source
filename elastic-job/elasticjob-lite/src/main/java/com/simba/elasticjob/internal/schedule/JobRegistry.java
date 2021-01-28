@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @Description job 注册器
+ * @Description job 注册中心
  * @Author yuanjx3
  * @Date 2021/1/15 16:08
  * @Version V1.0
@@ -33,7 +33,7 @@ public class JobRegistry {
         return instance;
     }
 
-    /** 功能描述: 注册一个注册中心
+    /** 功能描述: 注册新注册中心
     * @Author: yuanjx3
     * @Date: 2021/1/15 17:13
     */
@@ -42,7 +42,7 @@ public class JobRegistry {
         registryCenter.addCacheData("/"+jobName);
     }
 
-    /** 功能描述: 注册一个任务
+    /** 功能描述: 注册新作业
      * @Author: yuanjx3
      * @Date: 2021/1/15 17:13
      */
@@ -121,9 +121,9 @@ public class JobRegistry {
     public void shutdown(String jobName){
         //通过任务调度控制器关闭任务调度器
         Optional.ofNullable(schedulerMap.remove(jobName)).ifPresent(JobScheduleController::shutdown);
-        //删除注册中心，并且清理jobName 的节点数据
+        //删除作业的注册中心，并且取消jobName的节点监听
         Optional.ofNullable(regCenterMap.remove(jobName)).ifPresent(regCenter->regCenter.evictCacheData("/"+jobName));
-        //删除集合中的任务实例数据
+        //删除集合中的作业实例数据
         jobInstanceMap.remove(jobName);
         //删除集合中的正在运行实例数据
         jobRunningMap.remove(jobName);

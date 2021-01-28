@@ -27,7 +27,8 @@ public class ConfigurationService {
     public JobConfiguration load(boolean fromCache){
         String result = null;
         if (fromCache){
-            result = jobNodeStorage.getJobNodeData(ConfigurationNode.ROOT); //获取配置信息根节点数据
+            //获取配置信息根节点数据
+            result = jobNodeStorage.getJobNodeData(ConfigurationNode.ROOT);
         }
         if (null == result){
             result = jobNodeStorage.getJobNodeDataDirectly(ConfigurationNode.ROOT);
@@ -63,6 +64,7 @@ public class ConfigurationService {
         }
     }
 
+    /** 检查作业服务器与注册中心之间最大允许时差 **/
     public void checkMaxTimeDiffSecondsTolerable() throws JobExecutionEnvironmentException {
         int maxTimeDiffSeconds = load(true).getMaxTimeDiffSeconds();
         if (0>maxTimeDiffSeconds){

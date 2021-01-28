@@ -28,6 +28,12 @@ public final class ExecutorContext {
     private final Map<String, Reloadable<?>> reloadableItems = new LinkedHashMap<>();
 
     public ExecutorContext(final JobConfiguration jobConfig) {
+        /**
+         *  加载所有Reloadable接口实现类，放入到reloadableItems集合中
+         *  实现类有：
+         *      com.simba.elasticjob.concurrent.ExecutorServiceReloadable
+         *      com.simba.elasticjob.error.handler.JobErrorHandlerReloadable
+         *  **/
         ServiceLoader.load(Reloadable.class).forEach(each -> {
             ElasticJobServiceLoader.newTypedServiceInstance(Reloadable.class, each.getType(), new Properties())
                     .ifPresent(reloadable -> reloadableItems.put(reloadable.getType(), reloadable));
@@ -35,7 +41,9 @@ public final class ExecutorContext {
         initReloadable(jobConfig);
     }
 
+    /** 初始化Reloadable **/
     private void initReloadable(final JobConfiguration jobConfig) {
+        // 迭代reloadableItems集合，将所有类型为ReloadablePostProcessor的类进行初始化（即实例化：ExecutorServiceReloadable）
         reloadableItems.values().stream().filter(each -> each instanceof ReloadablePostProcessor).forEach(each -> ((ReloadablePostProcessor) each).init(jobConfig));
     }
 
@@ -49,7 +57,7 @@ public final class ExecutorContext {
     }
 
     /**
-     * Get instance.
+     * Get instance. 获取作业执行服务实例
      *
      * @param targetClass target class
      * @param <T>         target type

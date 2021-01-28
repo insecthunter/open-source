@@ -53,6 +53,7 @@ public class JobShutdownHookPlugin implements SchedulerPlugin {
 
     private void registerShutdownHook() {
         log.info("Registering Quartz shutdown hook. {}", jobName);
+        System.out.println("Registering Quartz shutdown hook. "+ jobName);
         Thread t = new Thread("Quartz Shutdown-Hook " + jobName) {
             @Override
             public void run() {

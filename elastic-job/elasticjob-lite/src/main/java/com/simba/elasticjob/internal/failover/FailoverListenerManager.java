@@ -51,14 +51,24 @@ public class FailoverListenerManager extends AbstractListenerManager {
 
         @Override
         protected void dataChanged(String path, Type eventType, String data) {
+            //如果作业服务器节点停机、失败重试标识为true、事件类型为节点删除、并且是path是job工作服务器实例的root节点路径,
             if (!JobRegistry.getInstance().isShutdown(jobName)
                     && isFailoverEnabled()
                     && Type.NODE_DELETED == eventType
                     && instanceNode.isInstancesPath(path)){
+                /**
+                 * 截取作业分片服务器实例ID：
+                 * 比如：path 为 “/my-job/MyJob/instances/192.168.0.179@-@17988”，
+                 *       instanceNode.getInstancesFullPath() = “/my-job/MyJob/instances/”，
+                 *       截取之后， jobInstanceId = 192.168.0.179@-@17988，结构为  ip + "@-@" + port
+                **/
                 String jobInstanceId = path.substring(instanceNode.getInstancesFullPath().length() + 1);
+                //这里判断如果从注册中心中获取的jobInstanceId与崩溃的jobInstanceId相同，则返回
                 if (jobInstanceId.equals(JobRegistry.getInstance().getJobInstance(jobName).getJobInstanceId())){
                     return;
                 }
+
+                //进行故障转移
                 List<Integer> failoverItems = failoverService.getFailoverItems(jobInstanceId);
                 if (!failoverItems.isEmpty()){
                     for (int each : failoverItems) {

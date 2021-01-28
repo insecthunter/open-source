@@ -56,15 +56,25 @@ public class JobScheduler {
     public JobScheduler(final CoordinatorRegistryCenter regCenter, final ElasticJob elasticJob, final JobConfiguration jobConfig) {
         Preconditions.checkArgument(null != elasticJob, "Elastic job cannot be null.");
         this.regCenter = regCenter;
+        // 获取作业监听器集合
         Collection<ElasticJobListener> jobListeners = getElasticJobListeners(jobConfig);
+        // 初始化代理操作门面类
         setUpFacade = new SetUpFacade(regCenter, jobConfig.getJobName(), jobListeners);
+        // 获取传入的elasticjob的类名
         String jobClassName = JobClassNameProviderFactory.getProvider().getJobClassName(elasticJob);
+        // 设置作业配置信息（更新作业信息到注册中心，并返回最新的作业配置信息）
         this.jobConfig = setUpFacade.setUpJobConfiguration(jobClassName, jobConfig);
+        // 初始化调度管理器
         schedulerFacade = new SchedulerFacade(regCenter, jobConfig.getJobName());
+        // 初始化 Lite job 外观类
         liteJobFacade = new LiteJobFacade(regCenter, jobConfig.getJobName(), jobListeners, findTracingConfiguration().orElse(null));
+        //校验作业属性
         validateJobProperties();
+        // 初始化 ElasticJob 作业执行器
         jobExecutor = new ElasticJobExecutor(elasticJob, this.jobConfig, liteJobFacade);
+        // 设置分布式单次执行作业监听器（如果jobListeners集合中有AbstractDistributeOnceElasticJobListener类型的监听器，为其设置单次执行服务）
         setGuaranteeServiceForElasticJobListeners(regCenter, jobListeners);
+        // 创建任务调度控制器
         jobScheduleController = createJobScheduleController();
     }
 
@@ -112,9 +122,13 @@ public class JobScheduler {
         }
     }
 
+    /** 创建任务调度控制器 **/
     private JobScheduleController createJobScheduleController() {
+        // 实例化任务调度器
         JobScheduleController result = new JobScheduleController(createScheduler(), createJobDetail(), getJobConfig().getJobName());
+        // 往作业注册中心的集合类中添加新的作业
         JobRegistry.getInstance().registerJob(getJobConfig().getJobName(), result);
+        // 注册启动信息
         registerStartUpInfo();
         return result;
     }
@@ -149,6 +163,7 @@ public class JobScheduler {
         return result;
     }
 
+    /** 注册启动信息 **/
     private void registerStartUpInfo() {
         JobRegistry.getInstance().registerRegistryCenter(jobConfig.getJobName(), regCenter);
         JobRegistry.getInstance().addJobInstance(jobConfig.getJobName(), new JobInstance());

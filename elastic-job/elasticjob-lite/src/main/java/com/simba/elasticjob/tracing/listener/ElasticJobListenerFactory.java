@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 /**
- * @Description ElasticJob 监听器工程类
+ * @Description ElasticJob 监听器工厂类
  * @Author yuanjx3
  * @Date 2021/1/22 9:41
  * @Version V1.0

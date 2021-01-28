@@ -11,6 +11,7 @@ import com.simba.elasticjob.utils.StringUtils;
  * @Version V1.0
  **/
 public final class JobShardingStrategyFactory {
+    // 默认采用平均分片策略
     private static final String DEFAULT_STRATEGY = "AVG_ALLOCATION";
 
     private JobShardingStrategyFactory() {}

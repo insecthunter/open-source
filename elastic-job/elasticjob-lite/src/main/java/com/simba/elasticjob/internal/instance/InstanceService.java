@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @Description 运行实例节点服务类
+ * @Description 作业实例服务类
  * @Author yuanjx3
  * @Date 2021/1/17 14:07
  * @Version V1.0

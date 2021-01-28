@@ -12,9 +12,7 @@ public interface JobExecutorServiceHandler extends TypedSPI {
     
     /**
      * Create executor service.
-     * 
      * @param jobName job name
-     * 
      * @return executor service
      */
     ExecutorService createExecutorService(String jobName);

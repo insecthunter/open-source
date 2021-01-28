@@ -72,6 +72,7 @@ public final class ShardingService {
      * @Date: 2021/1/17 18:03
      */
     public void shardingIfNecessary(){
+        // 获取可用的作业服务器实例
         List<JobInstance> availableJobInstances = instanceService.getAvailableJobInstances();
         if (!isNeedSharding()||availableJobInstances.isEmpty()){
             return;
@@ -80,13 +81,20 @@ public final class ShardingService {
             blockUntilShardingCompleted();
             return;
         }
+        // 等待其他的分片操作执行完毕
         waitingOtherShardingItemCompleted();
+        // 获取作业配置
         JobConfiguration jobConfig = configurationService.load(false);
+        // 得到作业分片总数
         int shardingTotalCount = jobConfig.getShardingTotalCount();
         System.out.println(">>>>>>>>>>>>Job "+ jobName+"分片 ---开始");
+        // 创建临时节点“leader/sharding/processing”，标识leader节点正在进行分片操作
         jobNodeStorage.fillEphemeralJobNode(ShardingNode.PROCESSING, "");
+        // 根据新的分片数，重新进行作业分片
         resetShardingInfo(shardingTotalCount);
+        // 根据作业配置的分片策略类型，从分片策略工厂类中获取对应的分片策略
         JobShardingStrategy jobShardingStrategy = JobShardingStrategyFactory.getStrategy(jobConfig.getJobShardingStrategyType());
+        // 在事务中执行作业分片
         jobNodeStorage.executeInTransaction(new PersistShardingInfoTransactionExecutionCallback(jobShardingStrategy.sharding(availableJobInstances,jobName,shardingTotalCount)));
         System.out.println("》》》》》》》》Job "+ jobName +" 分片完成~~~~~~");
     }
@@ -102,12 +110,12 @@ public final class ShardingService {
 
     private void waitingOtherShardingItemCompleted() {
         while (executionService.hashRunningItems()){
-            System.out.println("job +"+ jobName + "在此等待一段时间，直到其他的作业执行结束");
+            System.out.println("job +"+ jobName + "在此等待一段时间，直到其他的作业分片执行结束");
             BlockUtils.waitingShorTime();
         }
     }
     
-    /** 功能描述:  重置作业分片
+    /** 功能描述:  重新进行作业分片
     * @Author: yuanjx3
     * @Date: 2021/1/18 15:23
     */

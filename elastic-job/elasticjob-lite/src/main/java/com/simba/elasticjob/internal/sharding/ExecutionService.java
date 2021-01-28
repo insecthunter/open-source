@@ -107,7 +107,7 @@ public class ExecutionService {
         return result;
     }
     
-    /** 功能描述: 如果有作业分片依然在执行中，设置未触发标识符
+    /** 功能描述: 如果没有作业分片在执行，设置未触发标识符
     * @Author: yuanjx3
     * @Date: 2021/1/17 17:22
     */

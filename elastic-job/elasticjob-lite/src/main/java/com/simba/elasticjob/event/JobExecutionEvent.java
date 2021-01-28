@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * @Description
+ * @Description 作业执行事件类
  * @Author yuanjx3
  * @Date 2021/1/21 15:53
  * @Version V1.0

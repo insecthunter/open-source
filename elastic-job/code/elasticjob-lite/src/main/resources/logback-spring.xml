@@ -8,22 +8,19 @@
     <!-- 导入默认的文件日志配置：FILE -->
     <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
     <springProfile name="dev">
-        <logger name="com.ai.iisc" level="INFO"></logger>
-        <logger name="com.ai.ecs.ecop" level="INFO"></logger>
+        <logger name="com.simba" level="INFO"></logger>
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
     <springProfile name="test">
-        <logger name="com.ai.iisc" level="INFO"></logger>
-        <logger name="com.ai.ecs.ecop" level="INFO"></logger>
+        <logger name="com.simba" level="INFO"></logger>
         <root level="INFO">
             <appender-ref ref="FILE"/>
         </root>
     </springProfile>
     <springProfile name="prod">
-        <logger name="com.ai.iisc" level="INFO"></logger>
-        <logger name="com.ai.ecs.ecop" level="INFO"></logger>
+        <logger name="com.simba" level="INFO"></logger>
         <root level="WARN">
             <appender-ref ref="FILE"/>
         </root>
@@ -31,8 +28,7 @@
     <!--<root level="DEBUG">-->
         <!--<appender-ref ref="CONSOLE" />-->
     <!--</root>-->
-    <logger name="com.ai.iisc" level="DEBUG"></logger>
-    <logger name="com.ai.ecs.ecop" level="DEBUG"></logger>
+    <logger name="com.simba" level="DEBUG"></logger>
     <root level="INFO">
         <appender-ref ref="FILE"/>
         <appender-ref ref="CONSOLE"/>
